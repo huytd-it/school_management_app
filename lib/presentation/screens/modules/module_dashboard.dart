@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../data/models/module_model.dart';
-import '../../widgets/common/custom_app_bar.dart';
-import '../../widgets/dashboard/module_card.dart';
-import '../../widgets/dashboard/quick_stats_card.dart';
-import '../../widgets/dashboard/recent_activity_item.dart';
-import '../../widgets/dashboard/search_filter_bar.dart';
-import '../../widgets/dashboard/welcome_header.dart';
+import '../../widgets/common/left_sidebar.dart';
+import '../../widgets/common/modern_bottom_nav.dart';
+import '../../widgets/common/responsive_layout.dart';
+import '../../widgets/common/role_based_navigation.dart';
+import '../dashboard/main_dashboard_screen.dart';
+import 'modules_screen.dart';
+import 'module_detail_screen.dart';
 
 class ModuleDashboard extends StatefulWidget {
   const ModuleDashboard({Key? key}) : super(key: key);
@@ -21,467 +18,296 @@ class ModuleDashboard extends StatefulWidget {
 }
 
 class _ModuleDashboardState extends State<ModuleDashboard> {
-  final TextEditingController _searchController = TextEditingController();
-  final List<ModuleModel> _allModules = getModules();
-  final List<RecentActivity> _recentActivities = getRecentActivities();
-  final List<QuickStat> _quickStats = getQuickStats();
-  
-  List<ModuleModel> _filteredModules = [];
-  String _selectedCategory = '';
-  bool _isLoading = true;
-  
-  @override
-  void initState() {
-    super.initState();
-    _filteredModules = _allModules;
-    
-    // Simulate loading delay
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    });
+  int _selectedBottomNavIndex = 0; // Default to dashboard tab
+  String _selectedRoute = '/dashboard';
+  bool _isLoggedIn = true;
+
+  // Get the current user role - in a real app, this would come from authentication
+  String get _userRole => 'admin';
+
+  List<SidebarItem> _getSidebarItems() {
+    return RoleBasedNavigation.getSidebarItems(_userRole);
   }
-  
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+
+  List<BottomNavItem> _getBottomNavItems() {
+    return RoleBasedNavigation.getBottomNavItems(_userRole);
   }
-  
-  void _filterModules(String query) {
-    setState(() {
-      if (query.isEmpty && _selectedCategory.isEmpty) {
-        _filteredModules = _allModules;
-      } else {
-        _filteredModules = _allModules.where((module) {
-          final matchesQuery = query.isEmpty || 
-              module.title.toLowerCase().contains(query.toLowerCase()) ||
-              module.description.toLowerCase().contains(query.toLowerCase());
-          
-          final matchesCategory = _selectedCategory.isEmpty || 
-              module.category == _selectedCategory;
-          
-          return matchesQuery && matchesCategory;
-        }).toList();
-      }
-    });
+
+  Widget _getScreenForRoute(String route) {
+    // Map routes to widgets/screens
+    switch (route) {
+      case '/dashboard':
+        return const MainDashboardScreen();
+      case '/modules':
+        return const ModulesScreen();
+      case '/academic':
+        return _buildPlaceholderScreen('Academic Management', Icons.school_rounded);
+      case '/academic/students':
+        return _buildPlaceholderScreen('Student Management', Icons.person_rounded);
+      case '/academic/teachers':
+        return _buildPlaceholderScreen('Teacher Management', Icons.person_rounded);
+      case '/academic/classes':
+        return _buildPlaceholderScreen('Class Management', Icons.class_rounded);
+      case '/administrative':
+        return _buildPlaceholderScreen('Administrative', Icons.business_rounded);
+      case '/administrative/assets':
+        return _buildPlaceholderScreen('Asset Management', Icons.inventory_2_rounded);
+      case '/administrative/library':
+        return _buildPlaceholderScreen('Library Management', Icons.menu_book_rounded);
+      case '/financial':
+        return _buildPlaceholderScreen('Financial Management', Icons.attach_money_rounded);
+      case '/reports':
+        return _buildPlaceholderScreen('Reports & Analytics', Icons.analytics_rounded);
+      case '/settings':
+        return _buildPlaceholderScreen('Settings', Icons.settings_rounded);
+      case '/messages':
+        return _buildPlaceholderScreen('Messages', Icons.message_rounded);
+      case '/profile':
+        return _buildPlaceholderScreen('Profile', Icons.person_rounded);
+      case '/calendar':
+        return _buildPlaceholderScreen('Calendar', Icons.calendar_today_rounded);
+      default:
+        // If route matches a module, show module detail
+        if (route.startsWith('/modules/')) {
+          final moduleId = route.split('/').last;
+          return ModuleDetailScreen(moduleId: moduleId);
+        }
+        return const MainDashboardScreen();
+    }
   }
-  
-  void _filterByCategory(String category) {
-    setState(() {
-      _selectedCategory = _selectedCategory == category ? '' : category;
-      _filterModules(_searchController.text);
-    });
-  }
-  
-  void _showFilterDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Filter Modules', style: AppTextStyles.h3),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+
+  Widget _buildPlaceholderScreen(String title, IconData icon) {
+    return SafeArea(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Categories', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
-            AppSpacing.heightMd,
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _buildCategoryChip(ModuleCategory.academic),
-                _buildCategoryChip(ModuleCategory.administrative),
-                _buildCategoryChip(ModuleCategory.financial),
-                _buildCategoryChip(ModuleCategory.communication),
-                _buildCategoryChip(ModuleCategory.support),
-                _buildCategoryChip(ModuleCategory.system),
-              ],
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.primaryMint.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                icon,
+                size: 64,
+                color: AppColors.primaryNavy,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              title,
+              style: AppTextStyles.h2,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'This screen is under development',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.darkGray,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _selectedRoute = '/dashboard';
+                  _selectedBottomNavIndex = 0;
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryMint,
+                foregroundColor: AppColors.primaryNavy,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: const Text('Back to Dashboard'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedCategory = '';
-                _filterModules(_searchController.text);
-              });
-              Navigator.pop(context);
-            },
-            child: const Text('Clear Filters'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryMint,
-              foregroundColor: AppColors.primaryNavy,
-            ),
-            child: const Text('Apply'),
-          ),
-        ],
       ),
     );
   }
-  
-  Widget _buildCategoryChip(String category) {
-    final isSelected = _selectedCategory == category;
-    
-    return FilterChip(
-      label: Text(category),
-      selected: isSelected,
-      onSelected: (selected) {
-        _filterByCategory(category);
-        Navigator.pop(context);
-      },
-      backgroundColor: Colors.white,
-      selectedColor: AppColors.primaryMint,
-      checkmarkColor: AppColors.primaryNavy,
-      labelStyle: AppTextStyles.bodySmall.copyWith(
-        color: isSelected ? AppColors.primaryNavy : AppColors.darkGray,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: isSelected ? AppColors.primaryMint : AppColors.mediumGray,
-        ),
-      ),
-    );
+
+  Widget _getScreenForBottomNavIndex(int index) {
+    // Map bottom nav index to route
+    final navItems = _getBottomNavItems();
+    if (index < navItems.length) {
+      final label = navItems[index].label.toLowerCase();
+      switch (label) {
+        case 'dashboard':
+          return _getScreenForRoute('/dashboard');
+        case 'modules':
+          return _getScreenForRoute('/modules');
+        case 'users':
+          return _getScreenForRoute('/users');
+        case 'reports':
+          return _getScreenForRoute('/reports');
+        case 'settings':
+          return _getScreenForRoute('/settings');
+        case 'messages':
+          return _getScreenForRoute('/messages');
+        case 'profile':
+          return _getScreenForRoute('/profile');
+        case 'academic':
+          return _getScreenForRoute('/academic');
+        default:
+          return const MainDashboardScreen();
+      }
+    }
+    return const MainDashboardScreen();
   }
-  
+
+  void _handleLogin() {
+    setState(() {
+      _isLoggedIn = true;
+      _selectedRoute = '/dashboard';
+      _selectedBottomNavIndex = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(
+    if (!_isLoggedIn) {
+      // Show login dialog/screen
+      return ResponsiveLayout(
         title: 'School Management',
-        showBackButton: false,
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFE8FCF8), Colors.white],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: AppSpacing.screenPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildWelcomeHeader(),
-                AppSpacing.heightXxl,
-                _buildQuickStats(),
-                AppSpacing.heightXxl,
-                SearchFilterBar(
-                  controller: _searchController,
-                  onChanged: _filterModules,
-                  onFilterTap: _showFilterDialog,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryMint.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                AppSpacing.heightXl,
-                _buildModuleGrid(),
-                AppSpacing.heightXxl,
-                _buildRecentActivity(),
-              ],
-            ),
+                child: const Icon(
+                  Icons.school_rounded,
+                  size: 64,
+                  color: AppColors.primaryNavy,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Welcome to School Management',
+                style: AppTextStyles.h2,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Please login to continue',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.darkGray,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
-      ),
-    );
-  }
-  
-  Widget _buildWelcomeHeader() {
-    if (_isLoading) {
-      return Shimmer.fromColors(
-        baseColor: AppColors.lightGray,
-        highlightColor: Colors.white,
-        child: Container(
-          height: 120,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
+        sidebarItems: [],
+        bottomNavItems: [],
+        selectedRoute: '',
+        selectedBottomNavIndex: 0,
+        onSidebarItemSelected: (_) {},
+        onBottomNavItemSelected: (_) {},
+        userName: '',
+        userRole: '',
+        onLogout: () {},
+        onLogin: _handleLogin,
       );
     }
-    
-    return WelcomeHeader(
+
+    // Priority: sidebar route > bottom nav
+    Widget mainContent;
+    if (_selectedRoute.isNotEmpty) {
+      mainContent = _getScreenForRoute(_selectedRoute);
+    } else {
+      mainContent = _getScreenForBottomNavIndex(_selectedBottomNavIndex);
+    }
+
+    return ResponsiveLayout(
+      title: 'School Management',
+      body: mainContent,
+      sidebarItems: _getSidebarItems(),
+      bottomNavItems: _getBottomNavItems(),
+      selectedRoute: _selectedRoute,
+      selectedBottomNavIndex: _selectedBottomNavIndex,
+      onSidebarItemSelected: (route) {
+        setState(() {
+          _selectedRoute = route;
+          // Update bottom nav index to match if possible
+          final navItems = _getBottomNavItems();
+          for (int i = 0; i < navItems.length; i++) {
+            final label = navItems[i].label.toLowerCase();
+            if ((route == '/dashboard' && label == 'dashboard') ||
+                (route == '/modules' && label == 'modules') ||
+                (route == '/reports' && label == 'reports') ||
+                (route == '/settings' && label == 'settings') ||
+                (route == '/messages' && label == 'messages') ||
+                (route == '/profile' && label == 'profile') ||
+                (route == '/academic' && label == 'academic')) {
+              _selectedBottomNavIndex = i;
+              break;
+            }
+          }
+        });
+      },
+      onBottomNavItemSelected: (index) {
+        setState(() {
+          _selectedBottomNavIndex = index;
+          final navItems = _getBottomNavItems();
+          if (index < navItems.length) {
+            final label = navItems[index].label.toLowerCase();
+            switch (label) {
+              case 'dashboard':
+                _selectedRoute = '/dashboard';
+                break;
+              case 'modules':
+                _selectedRoute = '/modules';
+                break;
+              case 'users':
+                _selectedRoute = '/users';
+                break;
+              case 'reports':
+                _selectedRoute = '/reports';
+                break;
+              case 'settings':
+                _selectedRoute = '/settings';
+                break;
+              case 'messages':
+                _selectedRoute = '/messages';
+                break;
+              case 'profile':
+                _selectedRoute = '/profile';
+                break;
+              case 'academic':
+                _selectedRoute = '/academic';
+                break;
+              default:
+                _selectedRoute = '/dashboard';
+            }
+          }
+        });
+      },
       userName: 'Admin User',
       userRole: 'School Administrator',
-      notificationCount: 5,
-      onNotificationTap: () {},
-      onProfileTap: () {},
-    );
-  }
-  
-  Widget _buildQuickStats() {
-    if (_isLoading) {
-      return GridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: _getQuickStatsCrossAxisCount(context),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.5,
-        children: List.generate(4, (index) => const QuickStatsShimmer()),
-      );
-    }
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Quick Stats', style: AppTextStyles.h3),
-        AppSpacing.heightMd,
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: _getQuickStatsCrossAxisCount(context),
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.5,
-          children: _quickStats.map((stat) => 
-            QuickStatsCard(
-              title: stat.title,
-              value: stat.value,
-              icon: stat.icon,
-              color: stat.color,
-            )
-          ).toList(),
+      onLogout: () {
+        setState(() {
+          _isLoggedIn = false;
+          _selectedRoute = '';
+          _selectedBottomNavIndex = 0;
+        });
+      },
+      onLogin: _handleLogin,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.notifications_outlined),
+          onPressed: () {
+            // Show notifications
+          },
         ),
       ],
-    );
-  }
-  
-  int _getQuickStatsCrossAxisCount(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    if (width > 1200) return 4;
-    if (width > 800) return 4;
-    if (width > 600) return 2;
-    return 2;
-  }
-  
-  Widget _buildModuleGrid() {
-    if (_isLoading) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Modules', style: AppTextStyles.h3),
-          AppSpacing.heightMd,
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: _getModuleGridCrossAxisCount(context),
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.85,
-            children: List.generate(6, (index) => const ModuleCardShimmer()),
-          ),
-        ],
-      );
-    }
-    
-    if (_filteredModules.isEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Modules', style: AppTextStyles.h3),
-          AppSpacing.heightXl,
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.search_off_rounded,
-                  size: 64,
-                  color: AppColors.darkGray.withOpacity(0.5),
-                ),
-                AppSpacing.heightMd,
-                Text(
-                  'No modules found',
-                  style: AppTextStyles.h3.copyWith(
-                    color: AppColors.darkGray,
-                  ),
-                ),
-                AppSpacing.heightSm,
-                Text(
-                  'Try adjusting your search or filters',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.darkGray,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Modules', style: AppTextStyles.h3),
-            if (_selectedCategory.isNotEmpty)
-              Chip(
-                label: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(_selectedCategory),
-                    AppSpacing.widthXs,
-                    const Icon(Icons.close, size: 16),
-                  ],
-                ),
-                backgroundColor: AppColors.primaryMint.withOpacity(0.2),
-                labelStyle: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.primaryNavy,
-                ),
-                onDeleted: () {
-                  setState(() {
-                    _selectedCategory = '';
-                    _filterModules(_searchController.text);
-                  });
-                },
-                deleteIconColor: AppColors.primaryNavy,
-              ),
-          ],
-        ),
-        AppSpacing.heightMd,
-        AnimationLimiter(
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: _getModuleGridCrossAxisCount(context),
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.85,
-            children: List.generate(
-              _filteredModules.length,
-              (index) => AnimationConfiguration.staggeredGrid(
-                position: index,
-                duration: const Duration(milliseconds: 300),
-                columnCount: _getModuleGridCrossAxisCount(context),
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: ModuleCard(
-                      title: _filteredModules[index].title,
-                      description: _filteredModules[index].description,
-                      icon: _filteredModules[index].icon,
-                      accentColor: _filteredModules[index].accentColor,
-                      stats: _filteredModules[index].stats,
-                      isActive: _filteredModules[index].isActive,
-                      onTap: () => _navigateToModule(_filteredModules[index].route),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  
-  int _getModuleGridCrossAxisCount(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    if (width > 1200) return 4;
-    if (width > 900) return 3;
-    if (width > 600) return 2;
-    return 1;
-  }
-  
-  Widget _buildRecentActivity() {
-    if (_isLoading) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Recent Activity', style: AppTextStyles.h3),
-          AppSpacing.heightMd,
-          ...List.generate(
-            3,
-            (index) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: const RecentActivityShimmer(),
-            ),
-          ),
-        ],
-      );
-    }
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Recent Activity', style: AppTextStyles.h3),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'View All',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.primaryNavy,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        AppSpacing.heightMd,
-        ...List.generate(
-          _recentActivities.length,
-          (index) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: RecentActivityItem(
-              title: _recentActivities[index].title,
-              description: _recentActivities[index].description,
-              time: _recentActivities[index].time,
-              icon: _recentActivities[index].icon,
-              color: _recentActivities[index].color,
-              onTap: () {
-                final moduleId = _recentActivities[index].moduleId;
-                final module = _allModules.firstWhere((m) => m.id == moduleId);
-                _navigateToModule(module.route);
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  
-  void _navigateToModule(String route) {
-    // This would use your app's navigation system
-    // For now, just print the route
-    print('Navigating to: $route');
-  }
-}
-
-// Placeholder module detail screen
-class ModuleDetailScreen extends StatelessWidget {
-  final String moduleId;
-  
-  const ModuleDetailScreen({
-    Key? key,
-    required this.moduleId,
-  }) : super(key: key);
-  
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Module Details',
-        showBackButton: true,
-      ),
-      body: Center(
-        child: Text('Module Detail Screen: $moduleId', style: AppTextStyles.h2),
-      ),
     );
   }
 }

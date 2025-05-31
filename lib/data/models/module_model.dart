@@ -44,7 +44,7 @@ List<ModuleModel> getModules() {
       icon: Icons.school_rounded,
       accentColor: const Color(0xFF3B82F6), // blue
       stats: ['1,234 Students', '98% Active'],
-      route: '/modules/student',
+      route: '/modules/student_management',
       category: ModuleCategory.academic,
     ),
     ModuleModel(
@@ -54,7 +54,7 @@ List<ModuleModel> getModules() {
       icon: Icons.person_rounded,
       accentColor: const Color(0xFF10B981), // green
       stats: ['89 Teachers', '42 Active Today'],
-      route: '/modules/teacher',
+      route: '/modules/teacher_management',
       category: ModuleCategory.academic,
     ),
     ModuleModel(
@@ -64,7 +64,7 @@ List<ModuleModel> getModules() {
       icon: Icons.class_rounded,
       accentColor: const Color(0xFFF59E0B), // orange
       stats: ['45 Classes', '28 Subjects'],
-      route: '/modules/class',
+      route: '/modules/class_subject',
       category: ModuleCategory.academic,
     ),
     ModuleModel(
@@ -86,7 +86,7 @@ List<ModuleModel> getModules() {
       icon: Icons.inventory_2_rounded,
       accentColor: const Color(0xFF06B6D4), // cyan
       stats: ['2,340 Items', '12 Pending'],
-      route: '/modules/assets',
+      route: '/modules/asset_management',
       category: ModuleCategory.administrative,
     ),
     ModuleModel(
@@ -96,7 +96,7 @@ List<ModuleModel> getModules() {
       icon: Icons.menu_book_rounded,
       accentColor: const Color(0xFFDC2626), // red
       stats: ['15,670 Books', '234 Issued'],
-      route: '/modules/library',
+      route: '/modules/library_management',
       category: ModuleCategory.administrative,
     ),
     ModuleModel(
@@ -106,7 +106,7 @@ List<ModuleModel> getModules() {
       icon: Icons.groups_rounded,
       accentColor: const Color(0xFF059669), // emerald
       stats: ['5 Open Positions', '23 Applications'],
-      route: '/modules/hr',
+      route: '/modules/hr_recruitment',
       category: ModuleCategory.administrative,
     ),
     ModuleModel(
@@ -128,7 +128,7 @@ List<ModuleModel> getModules() {
       icon: Icons.payments_rounded,
       accentColor: const Color(0xFFEA580C), // orange-600
       stats: ['\$45,200 Collected', '78 Pending'],
-      route: '/modules/fee',
+      route: '/modules/fee_management',
       category: ModuleCategory.financial,
     ),
     ModuleModel(
@@ -170,7 +170,7 @@ List<ModuleModel> getModules() {
       icon: Icons.family_restroom_rounded,
       accentColor: const Color(0xFF1565C0), // blue-700
       stats: ['567 Parents', '89% Active'],
-      route: '/modules/parent',
+      route: '/modules/parent_communication',
       category: ModuleCategory.communication,
     ),
 
