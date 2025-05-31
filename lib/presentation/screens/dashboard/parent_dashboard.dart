@@ -31,6 +31,467 @@ class _ParentDashboardState extends State<ParentDashboard> {
     },
   ];
 
+  Widget _buildDashboardTab() {
+    return SingleChildScrollView(
+      padding: AppSpacing.screenPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Welcome Header
+          _buildWelcomeHeader(),
+          
+          AppSpacing.heightXxl,
+          
+          // Child Selector
+          _buildChildSelector(),
+          
+          AppSpacing.heightXxl,
+          
+          // Child Overview
+          _buildChildOverview(),
+          
+          AppSpacing.heightXxl,
+          
+          // Quick Actions
+          Text('Quick Actions', style: AppTextStyles.h2),
+          AppSpacing.heightMd,
+          _buildQuickActions(),
+          
+          AppSpacing.heightXxl,
+          
+          // Recent Updates
+          Text('Recent Updates', style: AppTextStyles.h2),
+          AppSpacing.heightMd,
+          _buildRecentUpdates(),
+          
+          const SizedBox(height: 100), // Space for bottom nav
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChildrenTab() {
+    return SingleChildScrollView(
+      padding: AppSpacing.screenPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('My Children', style: AppTextStyles.h2),
+          AppSpacing.heightMd,
+          
+          ...children.map((child) => Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(20),
+            decoration: AppDecorations.softCard,
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryMint.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Icon(
+                    Icons.child_care_rounded,
+                    color: AppColors.primaryNavy,
+                    size: 30,
+                  ),
+                ),
+                AppSpacing.widthLg,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        child['name']!,
+                        style: AppTextStyles.h3,
+                      ),
+                      AppSpacing.heightXs,
+                      Text(
+                        '${child['class']}  •  ID: ${child['id']}',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.darkGray,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: AppColors.darkGray,
+                  ),
+                  onPressed: () {
+                    // Navigate to child details
+                  },
+                ),
+              ],
+            ),
+          )).toList(),
+          
+          AppSpacing.heightXxl,
+          
+          Text('Academic Performance', style: AppTextStyles.h2),
+          AppSpacing.heightMd,
+          
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: AppDecorations.softCard,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Sarah Johnson',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Grade: A-',
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.success,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                AppSpacing.heightLg,
+                _buildSubjectProgressBar('Mathematics', 0.92, AppColors.info),
+                AppSpacing.heightMd,
+                _buildSubjectProgressBar('Science', 0.85, AppColors.success),
+                AppSpacing.heightMd,
+                _buildSubjectProgressBar('English', 0.78, AppColors.warning),
+                AppSpacing.heightMd,
+                _buildSubjectProgressBar('History', 0.88, AppColors.primaryMint),
+              ],
+            ),
+          ),
+          
+          AppSpacing.heightXxl,
+          
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: AppDecorations.softCard,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Michael Johnson',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.warning.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Grade: B+',
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.warning,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                AppSpacing.heightLg,
+                _buildSubjectProgressBar('Mathematics', 0.75, AppColors.info),
+                AppSpacing.heightMd,
+                _buildSubjectProgressBar('Science', 0.82, AppColors.success),
+                AppSpacing.heightMd,
+                _buildSubjectProgressBar('English', 0.70, AppColors.warning),
+                AppSpacing.heightMd,
+                _buildSubjectProgressBar('History', 0.79, AppColors.primaryMint),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubjectProgressBar(String subject, double progress, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              subject,
+              style: AppTextStyles.bodyMedium,
+            ),
+            Text(
+              '${(progress * 100).toInt()}%',
+              style: AppTextStyles.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        AppSpacing.heightXs,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: color.withOpacity(0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            minHeight: 8,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeesTab() {
+    final feeItems = [
+      {
+        'term': 'Term 1 Tuition',
+        'amount': '\$2,500',
+        'dueDate': '15 Sep 2023',
+        'status': 'Paid',
+      },
+      {
+        'term': 'Term 2 Tuition',
+        'amount': '\$2,500',
+        'dueDate': '15 Jan 2024',
+        'status': 'Pending',
+      },
+      {
+        'term': 'Annual Library Fee',
+        'amount': '\$150',
+        'dueDate': '30 Sep 2023',
+        'status': 'Paid',
+      },
+      {
+        'term': 'Sports Activities',
+        'amount': '\$300',
+        'dueDate': '15 Feb 2024',
+        'status': 'Pending',
+      },
+      {
+        'term': 'School Trip',
+        'amount': '\$450',
+        'dueDate': '10 Mar 2024',
+        'status': 'Pending',
+      },
+    ];
+
+    return SingleChildScrollView(
+      padding: AppSpacing.screenPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Fee Summary', style: AppTextStyles.h2),
+          AppSpacing.heightMd,
+          
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: AppDecorations.softCard,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Total Fees',
+                          style: AppTextStyles.bodyMedium,
+                        ),
+                        Text(
+                          '\$5,900',
+                          style: AppTextStyles.h2,
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Paid',
+                          style: AppTextStyles.bodyMedium,
+                        ),
+                        Text(
+                          '\$2,650',
+                          style: AppTextStyles.h3.copyWith(
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                AppSpacing.heightLg,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: 0.45,
+                    backgroundColor: AppColors.lightGray,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.success),
+                    minHeight: 10,
+                  ),
+                ),
+                AppSpacing.heightMd,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Remaining: \$3,250',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.warning,
+                      ),
+                    ),
+                    Text(
+                      '45% Paid',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.success,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          AppSpacing.heightXxl,
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Fee Details', style: AppTextStyles.h2),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Handle payment
+                },
+                icon: const Icon(Icons.payment_rounded, size: 18),
+                label: const Text('Pay Now'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.success,
+                  foregroundColor: AppColors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+              ),
+            ],
+          ),
+          AppSpacing.heightMd,
+          
+          ...feeItems.map((fee) {
+            final bool isPaid = fee['status'] == 'Paid';
+            
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: AppDecorations.softCard,
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: (isPaid ? AppColors.success : AppColors.warning).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      isPaid ? Icons.check_circle_rounded : Icons.pending_rounded,
+                      color: isPaid ? AppColors.success : AppColors.warning,
+                      size: 20,
+                    ),
+                  ),
+                  AppSpacing.widthMd,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          fee['term']!,
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          'Due: ${fee['dueDate']}',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.darkGray,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        fee['amount']!,
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: (isPaid ? AppColors.success : AppColors.warning).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          fee['status']!,
+                          style: AppTextStyles.caption.copyWith(
+                            color: isPaid ? AppColors.success : AppColors.warning,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessagesTab() {
+    return Center(
+      child: Text('Messages Tab Content', style: AppTextStyles.h2),
+    );
+  }
+
+  Widget _buildProfileTab() {
+    return Center(
+      child: Text('Profile Tab Content', style: AppTextStyles.h2),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,41 +510,15 @@ class _ParentDashboardState extends State<ParentDashboard> {
             ],
           ),
         ),
-        child: SingleChildScrollView(
-          padding: AppSpacing.screenPadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome Header
-              _buildWelcomeHeader(),
-              
-              AppSpacing.heightXxl,
-              
-              // Child Selector
-              _buildChildSelector(),
-              
-              AppSpacing.heightXxl,
-              
-              // Child Overview
-              _buildChildOverview(),
-              
-              AppSpacing.heightXxl,
-              
-              // Quick Actions
-              Text('Quick Actions', style: AppTextStyles.h2),
-              AppSpacing.heightMd,
-              _buildQuickActions(),
-              
-              AppSpacing.heightXxl,
-              
-              // Recent Updates
-              Text('Recent Updates', style: AppTextStyles.h2),
-              AppSpacing.heightMd,
-              _buildRecentUpdates(),
-              
-              const SizedBox(height: 100), // Space for bottom nav
-            ],
-          ),
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            _buildDashboardTab(),
+            _buildChildrenTab(),
+            _buildFeesTab(),
+            _buildMessagesTab(),
+            _buildProfileTab(),
+          ],
         ),
       ),
       bottomNavigationBar: ModernBottomNav(
