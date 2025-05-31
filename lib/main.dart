@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'core/config/injection_container.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/screens/splash/splash_screen.dart';
+import 'presentation/screens/modules/module_dashboard.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized
@@ -32,7 +33,9 @@ class SchoolManagementApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
-      home: const SplashScreen(),
+      // For testing, directly show the module dashboard
+      // Change back to SplashScreen() for production
+      home: const ModuleDashboard(),
     );
   }
 }

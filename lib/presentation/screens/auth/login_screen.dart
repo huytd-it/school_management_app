@@ -9,6 +9,7 @@ import '../dashboard/admin_dashboard.dart';
 import '../dashboard/teacher_dashboard.dart';
 import '../dashboard/student_dashboard.dart';
 import '../dashboard/parent_dashboard.dart';
+import '../modules/module_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -83,10 +84,15 @@ class _LoginScreenState extends State<LoginScreen>
           _isLoading = false;
         });
 
-        // For demo purposes, navigate based on email domain
+        // For demo purposes, navigate to the module dashboard
         final email = _emailController.text.toLowerCase();
         Widget destinationScreen;
 
+        // For testing, always go to the module dashboard
+        destinationScreen = const ModuleDashboard();
+        
+        // Uncomment this for role-based navigation
+        /*
         if (email.contains('admin')) {
           destinationScreen = const AdminDashboard();
         } else if (email.contains('teacher')) {
@@ -96,9 +102,9 @@ class _LoginScreenState extends State<LoginScreen>
         } else if (email.contains('parent')) {
           destinationScreen = const ParentDashboard();
         } else {
-          // Default to student dashboard
           destinationScreen = const StudentDashboard();
         }
+        */
 
         Navigator.pushReplacement(
           context,

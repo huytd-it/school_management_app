@@ -9,6 +9,7 @@ import '../../widgets/common/custom_app_bar.dart';
 import '../../widgets/common/modern_bottom_nav.dart';
 import '../../widgets/dashboard/dashboard_card.dart';
 import '../../widgets/dashboard/action_button.dart';
+import '../modules/module_dashboard.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -433,9 +434,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildClassesTab() {
-    return Center(
-      child: Text('Classes Tab Content', style: AppTextStyles.h2),
-    );
+    return const ModuleDashboard();
   }
 
   Widget _buildReportsTab() {
@@ -489,7 +488,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         items: const [
           BottomNavItem(icon: Icons.dashboard_rounded, label: 'Dashboard'),
           BottomNavItem(icon: Icons.people_rounded, label: 'Users'),
-          BottomNavItem(icon: Icons.school_rounded, label: 'Classes'),
+          BottomNavItem(icon: Icons.apps_rounded, label: 'Modules'),
           BottomNavItem(icon: Icons.analytics_rounded, label: 'Reports'),
           BottomNavItem(icon: Icons.settings_rounded, label: 'Settings'),
         ],
