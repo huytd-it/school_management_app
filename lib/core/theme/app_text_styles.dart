@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+flutter pub get
 import 'app_colors.dart';
 
 /// Typography system using Inter and Plus Jakarta Sans fonts
