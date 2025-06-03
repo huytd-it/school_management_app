@@ -5,10 +5,6 @@ import '../../../core/theme/app_decorations.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/utils/validators.dart';
 import '../../widgets/common/modern_text_field.dart';
-import '../dashboard/admin_dashboard.dart';
-import '../dashboard/teacher_dashboard.dart';
-import '../dashboard/student_dashboard.dart';
-import '../dashboard/parent_dashboard.dart';
 import '../modules/module_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
