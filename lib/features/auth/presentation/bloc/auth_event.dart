@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-/// Base authentication event
+/// Base class for all authentication events
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
 
@@ -8,23 +8,56 @@ abstract class AuthEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Login event
-class AuthLoginRequested extends AuthEvent {
+/// Event to check the current authentication status
+class AuthStatusChecked extends AuthEvent {
+  const AuthStatusChecked();
+}
+
+/// Event triggered when user requests login with email/password
+class AuthEmailLoginRequested extends AuthEvent {
   final String email;
   final String password;
-  final bool rememberMe;
 
-  const AuthLoginRequested({
+  const AuthEmailLoginRequested({
     required this.email,
     required this.password,
-    this.rememberMe = false,
   });
 
   @override
-  List<Object?> get props => [email, password, rememberMe];
+  List<Object?> get props => [email, password];
 }
 
-/// Register event
+/// Event triggered when user requests Google login
+class AuthGoogleLoginRequested extends AuthEvent {
+  const AuthGoogleLoginRequested();
+}
+
+/// Event triggered when user requests Microsoft login
+class AuthMicrosoftLoginRequested extends AuthEvent {
+  const AuthMicrosoftLoginRequested();
+}
+
+/// Event triggered when user requests logout
+class AuthLogoutRequested extends AuthEvent {
+  const AuthLogoutRequested();
+}
+
+/// Event triggered to refresh authentication tokens
+class AuthTokenRefreshRequested extends AuthEvent {
+  const AuthTokenRefreshRequested();
+}
+
+/// Event triggered when authentication state changes externally
+class AuthStateChanged extends AuthEvent {
+  final bool isAuthenticated;
+  
+  const AuthStateChanged(this.isAuthenticated);
+
+  @override
+  List<Object?> get props => [isAuthenticated];
+}
+
+/// Event triggered when user requests registration
 class AuthRegisterRequested extends AuthEvent {
   final String email;
   final String password;
@@ -46,22 +79,7 @@ class AuthRegisterRequested extends AuthEvent {
   List<Object?> get props => [email, password, confirmPassword, firstName, lastName, phone];
 }
 
-/// Logout event
-class AuthLogoutRequested extends AuthEvent {
-  const AuthLogoutRequested();
-}
-
-/// Check authentication status event
-class AuthStatusChecked extends AuthEvent {
-  const AuthStatusChecked();
-}
-
-/// Refresh token event
-class AuthTokenRefreshRequested extends AuthEvent {
-  const AuthTokenRefreshRequested();
-}
-
-/// Forgot password event
+/// Event triggered when user requests password reset
 class AuthForgotPasswordRequested extends AuthEvent {
   final String email;
 
@@ -71,7 +89,7 @@ class AuthForgotPasswordRequested extends AuthEvent {
   List<Object?> get props => [email];
 }
 
-/// Reset password event
+/// Event triggered when user submits new password during reset
 class AuthResetPasswordRequested extends AuthEvent {
   final String token;
   final String newPassword;
@@ -87,7 +105,7 @@ class AuthResetPasswordRequested extends AuthEvent {
   List<Object?> get props => [token, newPassword, confirmPassword];
 }
 
-/// Change password event
+/// Event triggered when user requests password change
 class AuthChangePasswordRequested extends AuthEvent {
   final String currentPassword;
   final String newPassword;
@@ -103,7 +121,7 @@ class AuthChangePasswordRequested extends AuthEvent {
   List<Object?> get props => [currentPassword, newPassword, confirmPassword];
 }
 
-/// Verify email event
+/// Event triggered when user requests email verification
 class AuthEmailVerificationRequested extends AuthEvent {
   final String token;
 
@@ -113,12 +131,12 @@ class AuthEmailVerificationRequested extends AuthEvent {
   List<Object?> get props => [token];
 }
 
-/// Resend email verification event
+/// Event triggered when user requests to resend email verification
 class AuthEmailVerificationResendRequested extends AuthEvent {
   const AuthEmailVerificationResendRequested();
 }
 
-/// Update profile event
+/// Event triggered when user requests to update profile information
 class AuthProfileUpdateRequested extends AuthEvent {
   final String? firstName;
   final String? lastName;
@@ -136,17 +154,17 @@ class AuthProfileUpdateRequested extends AuthEvent {
   List<Object?> get props => [firstName, lastName, phone, avatar];
 }
 
-/// Clear error event
+/// Event triggered to clear any authentication errors
 class AuthErrorCleared extends AuthEvent {
   const AuthErrorCleared();
 }
 
-/// Auto login event (for remember me functionality)
+/// Event triggered for auto-login functionality (e.g., when user has opted to "remember me")
 class AuthAutoLoginRequested extends AuthEvent {
   const AuthAutoLoginRequested();
 }
 
-/// Session timeout event
+/// Event triggered when session timeout is detected
 class AuthSessionTimeoutDetected extends AuthEvent {
   const AuthSessionTimeoutDetected();
 }

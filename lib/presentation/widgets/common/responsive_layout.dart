@@ -275,30 +275,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Don\'t have an account?',
-                    style: TextStyle(
-                      color: AppColors.darkGray,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // Handle registration
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      'Register',
-                      style: TextStyle(
-                        color: AppColors.primaryNavy,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+
               const SizedBox(height: 8),
               // Demo credentials hint
               Container(

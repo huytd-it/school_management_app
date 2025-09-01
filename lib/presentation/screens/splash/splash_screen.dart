@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/constants/app_spacing.dart';
+import '../../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../../features/auth/presentation/bloc/auth_state.dart';
+import '../modules/module_dashboard.dart';
 import '../auth/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -53,11 +57,23 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
     
     if (mounted) {
+      // Check authentication state and navigate accordingly
+      final authState = context.read<AuthBloc>().state;
+      
+      Widget destination;
+      if (authState is AuthAuthenticated) {
+        destination = BlocProvider.value(
+          value: context.read<AuthBloc>(),
+          child: const ModuleDashboard(),
+        );
+      } else {
+        destination = const LoginScreen();
+      }
+      
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => 
-              const LoginScreen(),
+          pageBuilder: (context, animation, secondaryAnimation) => destination,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(
               opacity: animation,

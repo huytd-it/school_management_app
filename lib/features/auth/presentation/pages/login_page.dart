@@ -7,6 +7,7 @@ import '../../../../shared/widgets/common/app_card.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../presentation/screens/modules/module_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -42,8 +43,14 @@ class _LoginPageState extends State<LoginPage> {
           listener: (context, state) {
             if (state is AuthAuthenticated) {
               // Navigate to dashboard
-              Navigator.of(context).pushReplacementNamed(
-                state.user.dashboardRoute,
+              Navigator.of(context).pushReplacement(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, _) => const ModuleDashboard(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  transitionDuration: const Duration(milliseconds: 300),
+                ),
               );
             } else if (state is AuthError) {
               // Show error message
@@ -245,10 +252,9 @@ class _LoginPageState extends State<LoginPage> {
   void _handleLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
-        AuthLoginRequested(
+        AuthEmailLoginRequested(
           email: _emailController.text.trim(),
           password: _passwordController.text,
-          rememberMe: _rememberMe,
         ),
       );
     }

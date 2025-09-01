@@ -15,15 +15,6 @@ abstract class AuthRemoteDataSource {
     bool rememberMe = false,
   });
 
-  /// Register new user
-  Future<UserModel> register({
-    required String email,
-    required String password,
-    required String firstName,
-    required String lastName,
-    String? phone,
-  });
-
   /// Logout current user
   Future<void> logout();
 
@@ -67,6 +58,15 @@ abstract class AuthRemoteDataSource {
 
   /// Get user permissions
   Future<List<String>> getUserPermissions();
+
+  /// Register new user
+  Future<AuthTokenModel> register({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    String? phone,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -113,47 +113,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  @override
-  Future<UserModel> register({
-    required String email,
-    required String password,
-    required String firstName,
-    required String lastName,
-    String? phone,
-  }) async {
-    try {
-      final response = await apiClient.post(
-        ApiConstants.register,
-        data: {
-          'email': email,
-          'password': password,
-          'first_name': firstName,
-          'last_name': lastName,
-          if (phone != null) 'phone': phone,
-        },
-      );
 
-      if (response.statusCode == 201) {
-        final data = response.data as Map<String, dynamic>;
-        return UserModel.fromJson(data['user'] ?? data);
-      } else {
-        throw ServerException(
-          'Registration failed with status code: ${response.statusCode}',
-          response.statusCode.toString(),
-        );
-      }
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 422) {
-        final data = e.response?.data as Map<String, dynamic>?;
-        final message = data?['message'] ?? 'Validation failed';
-        final errors = data?['errors'] as Map<String, dynamic>?;
-        throw ValidationException(message, errors?.cast<String, String>());
-      }
-      throw ServerException(e.message ?? 'Registration failed');
-    } catch (e) {
-      throw ServerException('Unexpected error during registration: $e');
-    }
-  }
 
   @override
   Future<void> logout() async {
@@ -433,6 +393,55 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw ServerException(e.message ?? 'Failed to get permissions');
     } catch (e) {
       throw ServerException('Unexpected error getting permissions: $e');
+    }
+  }
+
+  @override
+  Future<AuthTokenModel> register({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    String? phone,
+  }) async {
+    try {
+      final data = {
+        'email': email,
+        'password': password,
+        'first_name': firstName,
+        'last_name': lastName,
+      };
+      
+      if (phone != null && phone.isNotEmpty) {
+        data['phone'] = phone;
+      }
+
+      final response = await apiClient.post(
+        ApiConstants.register,
+        data: data,
+      );
+
+      if (response.statusCode == 201) {
+        final responseData = response.data as Map<String, dynamic>;
+        return AuthTokenModel.fromApiResponse(responseData);
+      } else {
+        throw ServerException(
+          'Registration failed with status code: ${response.statusCode}',
+          response.statusCode.toString(),
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 422) {
+        final data = e.response?.data as Map<String, dynamic>?;
+        final message = data?['message'] ?? 'Validation failed';
+        final errors = data?['errors'] as Map<String, dynamic>?;
+        throw ValidationException(message, errors?.cast<String, String>());
+      } else if (e.response?.statusCode == 409) {
+        throw const ValidationException('Email already exists');
+      }
+      throw ServerException(e.message ?? 'Registration failed');
+    } catch (e) {
+      throw ServerException('Unexpected error during registration: $e');
     }
   }
 }

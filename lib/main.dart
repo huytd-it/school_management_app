@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'core/config/injection_container.dart';
-import 'core/config/app_routes.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/authentication_service.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'presentation/screens/splash/splash_screen.dart';
@@ -18,8 +17,8 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   
-  // Initialize dependencies
-  await initializeDependencies();
+  // Initialize authentication service
+  await AuthenticationService.instance.initialize();
   
   // Run the app
   runApp(const SchoolManagementApp());
@@ -33,17 +32,15 @@ class SchoolManagementApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (context) => sl<AuthBloc>()..add(const AuthStatusChecked()),
+          create: (context) => AuthBloc()..add(const AuthStatusChecked()),
         ),
       ],
       child: MaterialApp(
-        title: 'School ERP System',
+        title: 'School Management System',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.light,
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
         home: const SplashScreen(),
       ),
     );

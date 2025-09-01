@@ -141,18 +141,7 @@ void _initAuthFeature() {
   
   // BLoC
   sl.registerFactory<AuthBloc>(
-    () => AuthBloc(
-      loginUseCase: sl<LoginUseCase>(),
-      logoutUseCase: sl<LogoutUseCase>(),
-      registerUseCase: sl<RegisterUseCase>(),
-      refreshTokenUseCase: sl<RefreshTokenUseCase>(),
-      getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
-      checkAuthStatusUseCase: sl<CheckAuthStatusUseCase>(),
-      forgotPasswordUseCase: sl<ForgotPasswordUseCase>(),
-      resetPasswordUseCase: sl<ResetPasswordUseCase>(),
-      changePasswordUseCase: sl<ChangePasswordUseCase>(),
-      authRepository: sl<AuthRepository>(),
-    ),
+    () => AuthBloc(),
   );
 }
 

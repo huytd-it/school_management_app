@@ -64,34 +64,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, User>> register({
-    required String email,
-    required String password,
-    required String firstName,
-    required String lastName,
-    String? phone,
-  }) async {
-    try {
-      // Check network connection
-      if (!await networkInfo.isConnected) {
-        return const Left(NetworkFailure('No internet connection'));
-      }
 
-      // Perform remote registration
-      final userModel = await remoteDataSource.register(
-        email: email,
-        password: password,
-        firstName: firstName,
-        lastName: lastName,
-        phone: phone,
-      );
-
-      return Right(userModel.toEntity());
-    } catch (e) {
-      return Left(ErrorHandler.handleException(e as Exception));
-    }
-  }
 
   @override
   Future<Either<Failure, void>> logout() async {
@@ -423,6 +396,50 @@ class AuthRepositoryImpl implements AuthRepository {
         (failure) => Left(failure),
         (permissions) => Right(permissions.contains(permission)),
       );
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e as Exception));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthToken>> register({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    String? phone,
+  }) async {
+    try {
+      // Check network connection
+      if (!await networkInfo.isConnected) {
+        return const Left(NetworkFailure('No internet connection'));
+      }
+
+      // Perform remote registration
+      final tokenModel = await remoteDataSource.register(
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+      );
+
+      // Get user profile and permissions
+      final userModel = await remoteDataSource.getCurrentUser();
+      final permissions = await remoteDataSource.getUserPermissions();
+
+      // Save to local storage
+      await localDataSource.saveAuthData(
+        token: tokenModel,
+        user: userModel,
+        permissions: permissions,
+        rememberMe: false, // Default to false for new registrations
+      );
+
+      // Update last login time
+      await localDataSource.updateLastLoginTime();
+
+      return Right(tokenModel.toEntity());
     } catch (e) {
       return Left(ErrorHandler.handleException(e as Exception));
     }

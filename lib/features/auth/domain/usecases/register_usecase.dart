@@ -1,17 +1,17 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/constants/validation_constants.dart';
-import '../entities/user.dart';
+import '../entities/auth_token.dart';
 import '../repositories/auth_repository.dart';
 
 /// Register use case
-/// Handles new user registration with validation
+/// Handles user registration with email, password and personal details
 class RegisterUseCase {
   final AuthRepository repository;
 
   RegisterUseCase(this.repository);
 
-  Future<Either<Failure, User>> call(RegisterParams params) async {
+  Future<Either<Failure, AuthToken>> call(RegisterParams params) async {
     // Validate input parameters
     final validationResult = _validateParams(params);
     if (validationResult != null) {
@@ -30,78 +30,104 @@ class RegisterUseCase {
 
   /// Validate registration parameters
   Failure? _validateParams(RegisterParams params) {
-    final errors = <String, String>{};
-
-    // First name validation
-    if (params.firstName.isEmpty) {
-      errors['firstName'] = ValidationConstants.firstNameRequiredMessage;
-    } else if (params.firstName.length < ValidationConstants.nameMinLength) {
-      errors['firstName'] = ValidationConstants.getMinLengthMessage(ValidationConstants.nameMinLength);
-    } else if (params.firstName.length > ValidationConstants.nameMaxLength) {
-      errors['firstName'] = ValidationConstants.getMaxLengthMessage(ValidationConstants.nameMaxLength);
-    } else if (!RegExp(ValidationConstants.namePattern).hasMatch(params.firstName)) {
-      errors['firstName'] = ValidationConstants.nameErrorMessage;
-    }
-
-    // Last name validation
-    if (params.lastName.isEmpty) {
-      errors['lastName'] = ValidationConstants.lastNameRequiredMessage;
-    } else if (params.lastName.length < ValidationConstants.nameMinLength) {
-      errors['lastName'] = ValidationConstants.getMinLengthMessage(ValidationConstants.nameMinLength);
-    } else if (params.lastName.length > ValidationConstants.nameMaxLength) {
-      errors['lastName'] = ValidationConstants.getMaxLengthMessage(ValidationConstants.nameMaxLength);
-    } else if (!RegExp(ValidationConstants.namePattern).hasMatch(params.lastName)) {
-      errors['lastName'] = ValidationConstants.nameErrorMessage;
-    }
-
     // Email validation
     if (params.email.isEmpty) {
-      errors['email'] = ValidationConstants.emailRequiredMessage;
-    } else if (!RegExp(ValidationConstants.emailPattern).hasMatch(params.email)) {
-      errors['email'] = ValidationConstants.emailErrorMessage;
+      return const ValidationFailure('Email is required');
+    }
+
+    if (!_isValidEmail(params.email)) {
+      return const ValidationFailure('Please enter a valid email address');
     }
 
     // Password validation
     if (params.password.isEmpty) {
-      errors['password'] = ValidationConstants.passwordRequiredMessage;
-    } else if (params.password.length < ValidationConstants.passwordMinLength) {
-      errors['password'] = ValidationConstants.getMinLengthMessage(ValidationConstants.passwordMinLength);
-    } else if (params.password.length > ValidationConstants.passwordMaxLength) {
-      errors['password'] = ValidationConstants.getMaxLengthMessage(ValidationConstants.passwordMaxLength);
-    } else if (!RegExp(ValidationConstants.passwordPattern).hasMatch(params.password)) {
-      errors['password'] = ValidationConstants.passwordErrorMessage;
+      return const ValidationFailure('Password is required');
+    }
+
+    if (params.password.length < ValidationConstants.passwordMinLength) {
+      return ValidationFailure(
+        ValidationConstants.getMinLengthMessage(ValidationConstants.passwordMinLength),
+      );
+    }
+
+    if (params.password.length > ValidationConstants.passwordMaxLength) {
+      return ValidationFailure(
+        ValidationConstants.getMaxLengthMessage(ValidationConstants.passwordMaxLength),
+      );
+    }
+
+    if (!RegExp(ValidationConstants.passwordPattern).hasMatch(params.password)) {
+      return const ValidationFailure(ValidationConstants.passwordErrorMessage);
     }
 
     // Confirm password validation
     if (params.confirmPassword.isEmpty) {
-      errors['confirmPassword'] = 'Please confirm your password';
-    } else if (params.password != params.confirmPassword) {
-      errors['confirmPassword'] = ValidationConstants.passwordMismatchMessage;
+      return const ValidationFailure('Please confirm your password');
+    }
+
+    if (params.password != params.confirmPassword) {
+      return const ValidationFailure(ValidationConstants.passwordMismatchMessage);
+    }
+
+    // First name validation
+    if (params.firstName.isEmpty) {
+      return const ValidationFailure('First name is required');
+    }
+
+    if (params.firstName.length < ValidationConstants.nameMinLength) {
+      return ValidationFailure(
+        ValidationConstants.getMinLengthMessage(ValidationConstants.nameMinLength),
+      );
+    }
+
+    if (params.firstName.length > ValidationConstants.nameMaxLength) {
+      return ValidationFailure(
+        ValidationConstants.getMaxLengthMessage(ValidationConstants.nameMaxLength),
+      );
+    }
+
+    if (!RegExp(ValidationConstants.namePattern).hasMatch(params.firstName)) {
+      return const ValidationFailure('First name contains invalid characters');
+    }
+
+    // Last name validation
+    if (params.lastName.isEmpty) {
+      return const ValidationFailure('Last name is required');
+    }
+
+    if (params.lastName.length < ValidationConstants.nameMinLength) {
+      return ValidationFailure(
+        ValidationConstants.getMinLengthMessage(ValidationConstants.nameMinLength),
+      );
+    }
+
+    if (params.lastName.length > ValidationConstants.nameMaxLength) {
+      return ValidationFailure(
+        ValidationConstants.getMaxLengthMessage(ValidationConstants.nameMaxLength),
+      );
+    }
+
+    if (!RegExp(ValidationConstants.namePattern).hasMatch(params.lastName)) {
+      return const ValidationFailure('Last name contains invalid characters');
     }
 
     // Phone validation (optional)
     if (params.phone != null && params.phone!.isNotEmpty) {
-      if (params.phone!.length < ValidationConstants.phoneMinLength ||
-          params.phone!.length > ValidationConstants.phoneMaxLength) {
-        errors['phone'] = 'Phone number must be between ${ValidationConstants.phoneMinLength} and ${ValidationConstants.phoneMaxLength} digits';
-      } else if (!RegExp(ValidationConstants.phonePattern).hasMatch(params.phone!)) {
-        errors['phone'] = ValidationConstants.phoneErrorMessage;
+      if (!RegExp(ValidationConstants.phonePattern).hasMatch(params.phone!)) {
+        return const ValidationFailure('Please enter a valid phone number');
       }
-    }
-
-    // Return validation failure if there are errors
-    if (errors.isNotEmpty) {
-      return ValidationFailure(
-        'Please fix the following errors:',
-        errors,
-      );
     }
 
     return null;
   }
+
+  /// Email validation helper
+  bool _isValidEmail(String email) {
+    return RegExp(ValidationConstants.emailPattern).hasMatch(email);
+  }
 }
 
-/// Register parameters
+/// Registration parameters
 class RegisterParams {
   final String email;
   final String password;

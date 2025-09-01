@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/user.dart';
+import '../../../../core/services/auth_models.dart';
 
-/// Base authentication state
+/// Base class for all authentication states
 abstract class AuthState extends Equatable {
   const AuthState();
 
@@ -9,68 +9,73 @@ abstract class AuthState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Initial state
+/// Initial state when the app starts
 class AuthInitial extends AuthState {
   const AuthInitial();
 }
 
-/// Loading state
+/// State when checking authentication status
 class AuthLoading extends AuthState {
   final String? message;
-
+  
   const AuthLoading({this.message});
 
   @override
   List<Object?> get props => [message];
 }
 
-/// Authenticated state
+/// State when user is authenticated
 class AuthAuthenticated extends AuthState {
-  final User user;
-  final List<String> permissions;
-
-  const AuthAuthenticated({
-    required this.user,
-    required this.permissions,
-  });
+  final AuthUser user;
+  
+  const AuthAuthenticated(this.user);
 
   @override
-  List<Object?> get props => [user, permissions];
+  List<Object?> get props => [user];
 }
 
-/// Unauthenticated state
+/// State when user is not authenticated
 class AuthUnauthenticated extends AuthState {
   const AuthUnauthenticated();
 }
 
-/// Authentication error state
+/// State when authentication process fails
 class AuthError extends AuthState {
   final String message;
-  final String? code;
-  final Map<String, String>? validationErrors;
-
+  final String? errorCode;
+  
   const AuthError({
     required this.message,
-    this.code,
-    this.validationErrors,
+    this.errorCode,
   });
 
   @override
-  List<Object?> get props => [message, code, validationErrors];
+  List<Object?> get props => [message, errorCode];
+}
 
-  /// Check if this is a validation error
-  bool get isValidationError => validationErrors != null && validationErrors!.isNotEmpty;
+/// State when login is in progress
+class AuthLoginInProgress extends AuthState {
+  final String provider;
+  
+  const AuthLoginInProgress(this.provider);
 
-  /// Check if this is a network error
-  bool get isNetworkError => code == 'NO_INTERNET' || code == 'TIMEOUT_ERROR';
+  @override
+  List<Object?> get props => [provider];
+}
 
-  /// Check if this is an authentication error
-  bool get isAuthError => code == 'UNAUTHORIZED' || code == 'FORBIDDEN';
+/// State when logout is in progress
+class AuthLogoutInProgress extends AuthState {
+  const AuthLogoutInProgress();
+}
+
+/// State when token refresh is in progress
+class AuthTokenRefreshing extends AuthState {
+  const AuthTokenRefreshing();
 }
 
 /// Registration success state
 class AuthRegistrationSuccess extends AuthState {
-  final User user;
+  final AuthUser user;
   final String message;
 
   const AuthRegistrationSuccess({
@@ -134,7 +139,7 @@ class AuthEmailVerificationResent extends AuthState {
 
 /// Profile update success state
 class AuthProfileUpdateSuccess extends AuthState {
-  final User user;
+  final AuthUser user;
   final String message;
 
   const AuthProfileUpdateSuccess({
@@ -158,7 +163,7 @@ class AuthSessionExpired extends AuthState {
 
 /// Token refresh success state
 class AuthTokenRefreshSuccess extends AuthState {
-  final User user;
+  final AuthUser user;
 
   const AuthTokenRefreshSuccess({required this.user});
 

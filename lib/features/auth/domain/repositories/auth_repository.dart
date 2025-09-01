@@ -13,15 +13,6 @@ abstract class AuthRepository {
     bool rememberMe = false,
   });
 
-  /// Register new user
-  Future<Either<Failure, User>> register({
-    required String email,
-    required String password,
-    required String firstName,
-    required String lastName,
-    String? phone,
-  });
-
   /// Logout current user
   Future<Either<Failure, void>> logout();
 
@@ -80,4 +71,13 @@ abstract class AuthRepository {
 
   /// Check if user has permission
   Future<Either<Failure, bool>> hasPermission(String permission);
+
+  /// Register new user
+  Future<Either<Failure, AuthToken>> register({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    String? phone,
+  });
 }
