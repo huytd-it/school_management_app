@@ -472,4 +472,4 @@ enum AppTextFieldSize {
 enum AppTextFieldVariant {
   filled,
   outlined,
-}", "original_text": "placeholder", "replace_all": false}]
+}

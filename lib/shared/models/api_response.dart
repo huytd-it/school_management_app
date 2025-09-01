@@ -116,3 +116,38 @@ class PaginatedResponse<T> extends Equatable {
   @override
   List<Object?> get props => [data, pagination, success, message];
 }
+
+/// Pagination metadata for paginated responses
+@JsonSerializable()
+class Pagination extends Equatable {
+  final int currentPage;
+  final int totalPages;
+  final int totalItems;
+  final int itemsPerPage;
+  final bool hasNextPage;
+  final bool hasPreviousPage;
+
+  const Pagination({
+    required this.currentPage,
+    required this.totalPages,
+    required this.totalItems,
+    required this.itemsPerPage,
+    required this.hasNextPage,
+    required this.hasPreviousPage,
+  });
+
+  factory Pagination.fromJson(Map<String, dynamic> json) =>
+      _$PaginationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PaginationToJson(this);
+
+  @override
+  List<Object?> get props => [
+        currentPage,
+        totalPages,
+        totalItems,
+        itemsPerPage,
+        hasNextPage,
+        hasPreviousPage,
+      ];
+}

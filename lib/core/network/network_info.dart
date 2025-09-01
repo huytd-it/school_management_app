@@ -5,8 +5,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 /// Provides methods to check internet connection and network type
 abstract class NetworkInfo {
   Future<bool> get isConnected;
-  Future<ConnectivityResult> get connectionType;
-  Stream<ConnectivityResult> get onConnectivityChanged;
+  Future<List<ConnectivityResult>> get connectionType;
+  Stream<List<ConnectivityResult>> get onConnectivityChanged;
   Future<bool> get hasInternetAccess;
 }
 
@@ -17,17 +17,17 @@ class NetworkInfoImpl implements NetworkInfo {
   
   @override
   Future<bool> get isConnected async {
-    final connectivityResult = await _connectivity.checkConnectivity();
-    return connectivityResult != ConnectivityResult.none;
+    final connectivityResults = await _connectivity.checkConnectivity();
+    return !connectivityResults.contains(ConnectivityResult.none) && connectivityResults.isNotEmpty;
   }
   
   @override
-  Future<ConnectivityResult> get connectionType async {
+  Future<List<ConnectivityResult>> get connectionType async {
     return await _connectivity.checkConnectivity();
   }
   
   @override
-  Stream<ConnectivityResult> get onConnectivityChanged {
+  Stream<List<ConnectivityResult>> get onConnectivityChanged {
     return _connectivity.onConnectivityChanged;
   }
   
@@ -50,26 +50,33 @@ class NetworkInfoImpl implements NetworkInfo {
   
   /// Check if connected to WiFi
   Future<bool> get isConnectedToWiFi async {
-    final connectivityResult = await connectionType;
-    return connectivityResult == ConnectivityResult.wifi;
+    final connectivityResults = await connectionType;
+    return connectivityResults.contains(ConnectivityResult.wifi);
   }
   
   /// Check if connected to mobile data
   Future<bool> get isConnectedToMobile async {
-    final connectivityResult = await connectionType;
-    return connectivityResult == ConnectivityResult.mobile;
+    final connectivityResults = await connectionType;
+    return connectivityResults.contains(ConnectivityResult.mobile);
   }
   
   /// Check if connected to ethernet
   Future<bool> get isConnectedToEthernet async {
-    final connectivityResult = await connectionType;
-    return connectivityResult == ConnectivityResult.ethernet;
+    final connectivityResults = await connectionType;
+    return connectivityResults.contains(ConnectivityResult.ethernet);
   }
   
   /// Get connection type as string
   Future<String> get connectionTypeString async {
-    final connectivityResult = await connectionType;
-    switch (connectivityResult) {
+    final connectivityResults = await connectionType;
+    
+    if (connectivityResults.isEmpty || connectivityResults.contains(ConnectivityResult.none)) {
+      return 'No Connection';
+    }
+    
+    // Return the first available connection type
+    final primaryConnection = connectivityResults.first;
+    switch (primaryConnection) {
       case ConnectivityResult.wifi:
         return 'WiFi';
       case ConnectivityResult.mobile:

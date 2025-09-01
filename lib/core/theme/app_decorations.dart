@@ -82,6 +82,54 @@ class AppDecorations {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
+
+  static InputDecoration inputDecoration({
+    String? hintText,
+    String? helperText,
+    String? errorText,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    bool enabled = true,
+  }) {
+    return InputDecoration(
+      filled: true,
+      fillColor: enabled ? AppColors.lightGray : AppColors.lightGray.withOpacity(0.5),
+      hintText: hintText,
+      helperText: helperText,
+      errorText: errorText,
+      hintStyle: TextStyle(
+        color: enabled ? AppColors.darkGray : AppColors.darkGray.withOpacity(0.5),
+        fontSize: 14,
+      ),
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primaryMint, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.error, width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.error, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
   
   // Button Styles
   static ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(

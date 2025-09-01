@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/config/injection_container.dart';
-import '../../../shared/widgets/common/app_button.dart';
-import '../../../shared/widgets/common/app_text_field.dart';
-import '../../../shared/widgets/common/app_card.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_dimensions.dart';
-import '../../../core/theme/app_text_styles.dart';
+import '../../../../core/config/injection_container.dart';
+import '../../../../shared/widgets/common/app_button.dart';
+import '../../../../shared/widgets/common/app_text_field.dart';
+import '../../../../shared/widgets/common/app_card.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_dimensions.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -379,4 +379,4 @@ class _RegisterPageState extends State<RegisterPage> {
       );
     }
   }
-}"
+}

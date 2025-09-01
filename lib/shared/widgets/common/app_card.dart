@@ -273,11 +273,11 @@ class AppCard extends StatelessWidget {
       case AppCardElevation.none:
         return null;
       case AppCardElevation.low:
-        return [AppDecorations.softShadow];
+        return AppDecorations.softShadow;
       case AppCardElevation.medium:
-        return [AppDecorations.cardShadow];
+        return AppDecorations.mediumShadow;
       case AppCardElevation.high:
-        return [AppDecorations.elevatedShadow];
+        return AppDecorations.largeShadow;
     }
   }
 }
@@ -318,7 +318,7 @@ class AppCardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (leading != null) ..[
+        if (leading != null) ...[
           leading!,
           const SizedBox(width: AppDimensions.sm),
         ],
@@ -332,7 +332,7 @@ class AppCardHeader extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (subtitle != null) ..[
+              if (subtitle != null) ...[
                 const SizedBox(height: AppDimensions.xs),
                 Text(
                   subtitle!,
@@ -344,7 +344,7 @@ class AppCardHeader extends StatelessWidget {
             ],
           ),
         ),
-        if (trailing != null) ..[
+        if (trailing != null) ...[
           const SizedBox(width: AppDimensions.sm),
           if (onTrailingPressed != null)
             GestureDetector(
@@ -394,4 +394,4 @@ class AppCardFooter extends StatelessWidget {
           .toList(),
     );
   }
-}", "original_text": "placeholder", "replace_all": false}]
+}

@@ -7,7 +7,7 @@ import '../../constants/storage_constants.dart';
 class AuthInterceptor extends Interceptor {
   final LocalStorageService _storageService;
   
-  AuthInterceptor() : _storageService = LocalStorageService();
+  AuthInterceptor() : _storageService = LocalStorageServiceImpl();
   
   @override
   void onRequest(

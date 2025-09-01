@@ -45,6 +45,17 @@ abstract class AuthLocalDataSource {
 
   /// Clear all authentication data
   Future<void> clearAllAuthData();
+
+  /// Save authentication data from successful login
+  Future<void> saveAuthData({
+    required AuthTokenModel token,
+    required UserModel user,
+    required List<String> permissions,
+    bool rememberMe = false,
+  });
+
+  /// Update last login time
+  Future<void> updateLastLoginTime();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -196,6 +207,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   }
 
   /// Save authentication data from successful login
+  @override
   Future<void> saveAuthData({
     required AuthTokenModel token,
     required UserModel user,
@@ -257,6 +269,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   }
 
   /// Update last login time
+  @override
   Future<void> updateLastLoginTime() async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;

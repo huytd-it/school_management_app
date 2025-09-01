@@ -381,4 +381,4 @@ enum AppButtonSize {
   small,
   medium,
   large,
-}", "original_text": "placeholder", "replace_all": false}]
+}
