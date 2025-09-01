@@ -11,7 +11,7 @@ class RoleBasedNavigation {
         return const [
           BottomNavItem(icon: Icons.dashboard_rounded, label: 'Dashboard'),
           BottomNavItem(icon: Icons.apps_rounded, label: 'Modules'),
-          BottomNavItem(icon: Icons.people_rounded, label: 'Users'),
+          BottomNavItem(icon: Icons.qr_code_scanner_rounded, label: 'QR Code'),
           BottomNavItem(icon: Icons.analytics_rounded, label: 'Reports'),
           BottomNavItem(icon: Icons.settings_rounded, label: 'Settings'),
         ];

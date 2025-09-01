@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/config/injection_container.dart';
+import 'core/config/app_routes.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
 import 'presentation/screens/splash/splash_screen.dart';
-import 'presentation/screens/modules/module_dashboard.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized
@@ -27,15 +30,22 @@ class SchoolManagementApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'School Management',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light,
-      // For testing, directly show the module dashboard
-      // Change back to SplashScreen() for production
-      home: const ModuleDashboard(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => sl<AuthBloc>()..add(const AuthStatusChecked()),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'School ERP System',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.light,
+        initialRoute: AppRoutes.splash,
+        onGenerateRoute: AppRoutes.generateRoute,
+        home: const SplashScreen(),
+      ),
     );
   }
 }

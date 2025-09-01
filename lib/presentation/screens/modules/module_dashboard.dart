@@ -9,6 +9,7 @@ import '../../widgets/common/role_based_navigation.dart';
 import '../dashboard/main_dashboard_screen.dart';
 import 'modules_screen.dart';
 import 'module_detail_screen.dart';
+import '../qr_scanner_screen.dart';
 
 class ModuleDashboard extends StatefulWidget {
   const ModuleDashboard({Key? key}) : super(key: key);
@@ -66,6 +67,8 @@ class _ModuleDashboardState extends State<ModuleDashboard> {
         return _buildPlaceholderScreen('Profile', Icons.person_rounded);
       case '/calendar':
         return _buildPlaceholderScreen('Calendar', Icons.calendar_today_rounded);
+      case '/qr-code':
+        return const QRScannerScreen();
       default:
         // If route matches a module, show module detail
         if (route.startsWith('/modules/')) {
@@ -139,8 +142,8 @@ class _ModuleDashboardState extends State<ModuleDashboard> {
           return _getScreenForRoute('/dashboard');
         case 'modules':
           return _getScreenForRoute('/modules');
-        case 'users':
-          return _getScreenForRoute('/users');
+        case 'qr code':
+          return _getScreenForRoute('/qr-code');
         case 'reports':
           return _getScreenForRoute('/reports');
         case 'settings':
